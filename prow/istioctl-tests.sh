@@ -43,13 +43,12 @@ function test_helm_files() {
   local expected_hub=${2}
   local expected_tag=${3}
 
-  hub=$(grep -oP 'hub: \K[^ ]+' "${istio_path}"/install/kubernetes/helm/istio/values.yaml | head -n 1)
-  tag=$(grep -oP 'tag: \K[^ ]+' "${istio_path}"/install/kubernetes/helm/istio/values.yaml | head -n 1)
-  [ "${hub}" == "${expected_hub}" ]
+  hub=$(grep hub: ${istio_path}/install/kubernetes/helm/istio/values.yaml | head -n 1 | cut -c 8-)
+  tag=$(grep tag: ${istio_path}/install/kubernetes/helm/istio/values.yaml | head -n 1 | cut -c 8-)  [ "${hub}" == "${expected_hub}" ]
   [ "${tag}" == "${expected_tag}" ]
 
-  hub=$(grep -oP 'hub: \K[^ ]+' "${istio_path}"/install/kubernetes/helm/istio-remote/values.yaml | head -n 1)
-  tag=$(grep -oP 'tag: \K[^ ]+' "${istio_path}"/install/kubernetes/helm/istio-remote/values.yaml | head -n 1)
+  hub=$(grep hub: ${istio_path}/install/kubernetes/helm/istio-remote/values.yaml | head -n 1 | cut -c 8-)
+  tag=$(grep tag: ${istio_path}/install/kubernetes/helm/istio-remote/values.yaml | head -n 1 | cut -c 8-)
   [ "${hub}" == "${expected_hub}" ]
   [ "${tag}" == "${expected_tag}" ]
 }
