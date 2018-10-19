@@ -32,8 +32,8 @@ function test_istioctl_version() {
   local expected_hub=${2}
   local expected_tag=${3}
 
-  hub=$(${istioctl_bin} version | grep -oP 'Hub: \K[^ ]+')
-  tag=$(${istioctl_bin} version | grep -oP 'Version: \K[^ ]+' | head -n 1)
+  local hub=$(${istioctl_bin} version | grep Hub: | head -n 1 | cut -c 6-)
+  local tag=$(${istioctl_bin} version | grep Version: | head -n 1 | cut -c 10-)
   [ "${hub}" == "${expected_hub}" ]
   [ "${tag}" == "${expected_tag}" ]
 }
@@ -43,12 +43,13 @@ function test_helm_files() {
   local expected_hub=${2}
   local expected_tag=${3}
 
-  hub=$(grep hub: ${istio_path}/install/kubernetes/helm/istio/values.yaml | head -n 1 | cut -c 8-)
-  tag=$(grep tag: ${istio_path}/install/kubernetes/helm/istio/values.yaml | head -n 1 | cut -c 8-)  [ "${hub}" == "${expected_hub}" ]
+  local hub=$(grep hub: ${istio_path}/install/kubernetes/helm/istio/values.yaml | head -n 1 | cut -c 8-)
+  local tag=$(grep tag: ${istio_path}/install/kubernetes/helm/istio/values.yaml | head -n 1 | cut -c 8-)
+  [ "${hub}" == "${expected_hub}" ]
   [ "${tag}" == "${expected_tag}" ]
 
-  hub=$(grep hub: ${istio_path}/install/kubernetes/helm/istio-remote/values.yaml | head -n 1 | cut -c 8-)
-  tag=$(grep tag: ${istio_path}/install/kubernetes/helm/istio-remote/values.yaml | head -n 1 | cut -c 8-)
+  local hub=$(grep hub: ${istio_path}/install/kubernetes/helm/istio-remote/values.yaml | head -n 1 | cut -c 8-)
+  local tag=$(grep tag: ${istio_path}/install/kubernetes/helm/istio-remote/values.yaml | head -n 1 | cut -c 8-)
   [ "${hub}" == "${expected_hub}" ]
   [ "${tag}" == "${expected_tag}" ]
 }
@@ -60,13 +61,13 @@ function test_helm_files() {
 download_untar_istio_release "${ISTIO_REL_URL}/docker.io" "${TAG}" docker.io
 test_istioctl_version docker.io/istio-${TAG}/bin/istioctl "docker.io/istio" "${TAG}"
 # TODO The expected hub should be docker.io/istio instead. Update after fix
-test_helm_files docker.io/istio-${TAG} "${HUB}" "${TAG}"
+test_helm_files docker.io/istio-${TAG} "docker.io/istio" "${TAG}"
 
 download_untar_istio_release "${ISTIO_REL_URL}/gcr.io" "${TAG}" gcr.io
 test_istioctl_version gcr.io/istio-${TAG}/bin/istioctl "gcr.io/istio-release" "${TAG}"
-test_helm_files docker.io/istio-${TAG} "${HUB}" "${TAG}"
+test_helm_files gcr.io/istio-${TAG} "${HUB}" "${TAG}"
 
 download_untar_istio_release "${ISTIO_REL_URL}" "${TAG}"
 test_istioctl_version istio-${TAG}/bin/istioctl "${HUB}" "${TAG}"
-test_helm_files docker.io/istio-${TAG} "${HUB}" "${TAG}"
+test_helm_files istio-${TAG} "${HUB}" "${TAG}"
 
