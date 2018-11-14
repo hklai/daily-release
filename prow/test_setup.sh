@@ -36,6 +36,8 @@ function git_clone_istio() {
 # Set up e2e tests for release qualification
 git_clone_istio
 
+source "prow/lib.sh"
+
 download_untar_istio_release ${ISTIO_REL_URL} ${TAG}
 
 # Use downloaded yaml artifacts rather than the ones generated locally
